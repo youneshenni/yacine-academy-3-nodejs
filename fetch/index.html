@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fetch API</title>
+  </head>
+  <body>
+    <h1>Fetch API</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>First name</th>
+          <th>Last name</th>
+          <th>E-mail</th>
+          <th>Gender</th>
+          <th>IP Address</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      const populateRow = (row) => {
+        const tbody = document.querySelector("tbody");
+        const tr = document.createElement("tr");
+        const id = document.createElement("td");
+        id.textContent = row.id;
+        const firstName = document.createElement("td");
+        firstName.textContent = row.first_name;
+        const lastName = document.createElement("td");
+        lastName.textContent = row.last_name;
+        const email = document.createElement("td");
+        email.textContent = row.email;
+        const gender = document.createElement("td");
+        gender.textContent = row.gender;
+        const ipAddress = document.createElement("td");
+        ipAddress.textContent = row.ip_address;
+        tr.appendChild(id);
+        tr.appendChild(firstName);
+        tr.appendChild(lastName);
+        tr.appendChild(email);
+        tr.appendChild(gender);
+        tr.appendChild(ipAddress);
+        tbody.appendChild(tr);
+      };
+      async function fetchUsers() {
+        const responsePromises = Promise.allSettled(
+          [...Array(10)].map((_, i) =>
+            fetch(`http://65.109.8.209:3001/${i + 1}`).then((res) => res.json())
+          )
+        );
+        const loadingParagraph = document.createElement("p");
+        loadingParagraph.textContent = "Loading...";
+        document.body.appendChild(loadingParagraph);
+        const responses = await responsePromises;
+        document.body.removeChild(loadingParagraph);
+        const nestedData = responses
+          .filter((response) => response.status === "fulfilled")
+          .map((response) => response.value);
+
+        nestedData.flat().forEach(populateRow);
+        return 1;
+      }
+
+      fetchUsers().then((x) => console.log(x));
+
+      //   const callTimeout = () =>
+      //     new Promise((resolve) => setTimeout(resolve, 3e3));
+
+      //   callTimeout()
+      //     .then(() => console.log(1))
+      //     .then(() => callTimeout().then(() => console.log(1.1)))
+      //     .then(() => console.log(2))
+      //     .then(callTimeout)
+      //     .then(() => console.log(3))
+      //     .then(callTimeout)
+      //     .then(() => console.log(4))
+      //     .then(callTimeout)
+      //     .then(() => console.log(5));
+
+      //   const returnErrorPromise = () =>
+      //     new Promise((resolve, reject) => {
+      //       setTimeout(() => {
+      //         resolve(1);
+      //       }, 1e3);
+      //     });
+
+      //   returnErrorPromise()
+      //     .catch((error) => console.log("Error", error))
+      //     .then(() => console.log("After error"))
+      //     .then(() => console.log("Success"));
+    </script>
+  </body>
+</html>
